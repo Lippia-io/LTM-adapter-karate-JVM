@@ -2,8 +2,10 @@ package ltm;
 
 import com.intuit.karate.RuntimeHook;
 
+import com.intuit.karate.StringUtils;
 import com.intuit.karate.core.FeatureRuntime;
 import com.intuit.karate.core.ScenarioRuntime;
+import com.intuit.karate.core.Step;
 import com.intuit.karate.core.StepResult;
 
 import ltm.models.run.request.TestDTO;
@@ -36,6 +38,7 @@ public abstract class TestManagerAPIAdapter implements RuntimeHook {
         String feature = sr.featureRuntime.feature.getName();
         TestDTO test = new TestDTO(title, runResponseDTO.getId(), status, feature, "SCENARIO", sr.tags.getTags(), steps.get());
         TestManagerAPIClient.createTest(test);
+        cleanSteps();
     }
 
     @Override
@@ -44,7 +47,7 @@ public abstract class TestManagerAPIAdapter implements RuntimeHook {
 
     @Override
     public void afterStep(StepResult result, ScenarioRuntime sr) {
-        String title = result.getStep().getText();
+        String stepText = getStepText(result.getStep());
         String status = result.getResult().getStatus();
         status = status.toUpperCase().substring(0, status.length() - 2);
         String base64Image = null;
@@ -61,7 +64,19 @@ public abstract class TestManagerAPIAdapter implements RuntimeHook {
             stackTrace = truncate(result.getResult().getError().getMessage(), 5);
         }
 
-        steps.get().add(new StepDTO(title, stackTrace, base64Image, status));
+        steps.get().add(new StepDTO(stepText, stackTrace, base64Image, status));
+    }
+
+    private String getStepText(Step step) {
+        StringBuilder stepTextBuilder = new StringBuilder();
+        stepTextBuilder.append(step.getPrefix());
+        stepTextBuilder.append(step.getText());
+
+        if (!StringUtils.isBlank(step.getDocString())) {
+            stepTextBuilder.append(step.getDocString());
+        }
+
+        return stepTextBuilder.toString();
     }
 
     private void cleanSteps() {
