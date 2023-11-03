@@ -29,14 +29,14 @@ public class PropertyManager {
 
     private static Properties getProperties() {
         if (properties.get() == null) {
-            try {
-                loadProperties();
-            } catch (IOException var1) {
-                throw new TestManagerException(var1.getMessage());
-            }
+            loadProperties();
         }
 
         return properties.get();
+    }
+
+    public static boolean isPropertiesFilePresent() {
+        return getProperties() != null;
     }
 
     public static String getProperty(String propertyKey) {
@@ -47,20 +47,21 @@ public class PropertyManager {
         return getProperties().containsKey(propertyKey) && !getProperties().getProperty(propertyKey).isEmpty();
     }
 
-    private static void loadProperties() throws IOException {
+    private static void loadProperties() {
         StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
         Properties clientProperties = new EncryptableProperties(encryptor);
 
         if (isResourceLoadable()) {
             InputStream inputStream = PropertyManager.class.getClassLoader().getResourceAsStream(PROPERTY_FILE_NAME);
-            clientProperties.load(inputStream);
+            try {
+                clientProperties.load(inputStream);
+            } catch (IOException e) {
+                return;
+            }
 
             properties.set(new EncryptableProperties(new StandardPBEStringEncryptor()));
             properties.get().putAll(clientProperties);
-            return;
         }
-
-        logger.info(() -> PROPERTY_FILE_NAME + " is not loadable because is not present in the project");
     }
 
     private static boolean isResourceLoadable() {
