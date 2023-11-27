@@ -70,6 +70,7 @@ public abstract class TestManagerAPIAdapter implements RuntimeHook {
     private String getStepText(Step step) {
         StringBuilder stepTextBuilder = new StringBuilder();
         stepTextBuilder.append(step.getPrefix());
+        stepTextBuilder.append(" ");
         stepTextBuilder.append(step.getText());
 
         if (!StringUtils.isBlank(step.getDocString())) {
