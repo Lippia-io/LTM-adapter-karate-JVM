@@ -2,20 +2,19 @@ package ltm.screenshots;
 
 import ltm.PropertyManager;
 
-import org.springframework.util.StringUtils;
-
 public class SSConfig {
     protected SSConfig(Strategy strategy) {
         this.strategy = strategy;
     }
 
     public static SSConfig load() {
-        String strategy = PropertyManager.getProperty("test-manager.ltm.screenshots");
-        if (StringUtils.isEmpty(strategy)) {
-            return new SSConfig(Strategy.DISABLED);
+        Strategy strategy = Strategy.DISABLED;
+        if (PropertyManager.isPropertiesFilePresent()) {
+            String strategyStr = PropertyManager.getProperty("test-manager.ltm.screenshots");
+            strategy = Strategy.getValue(strategyStr);
         }
 
-        return new SSConfig(Strategy.getValue(strategy));
+        return new SSConfig(strategy);
     }
 
     public boolean contains(Strategy strategy) {
