@@ -34,7 +34,7 @@ public abstract class TestManagerAPIAdapter implements RuntimeHook {
     public void afterScenario(ScenarioRuntime sr) {
         String title = sr.scenario.getName();
         String status = sr.result.isFailed() ? "failed" : "passed";
-        status = status.toUpperCase().substring(0, status.toString().length() - 2);
+        status = status.toUpperCase().substring(0, status.length() - 2);
         String feature = sr.featureRuntime.feature.getName();
         TestDTO test = new TestDTO(title, runResponseDTO.getId(), status, feature, "SCENARIO", sr.tags.getTags(), steps.get());
         TestManagerAPIClient.createTest(test);
