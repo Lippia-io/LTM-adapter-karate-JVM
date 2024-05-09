@@ -34,6 +34,8 @@ final class TestManagerAPIClient {
     private static final String TEST_MANAGER_API_PORT_KEY = System.getProperty("TEST_MANAGER_API_PORT");
     private static final String TEST_MANAGER_RUN_NAME = System.getProperty("TEST_MANAGER_RUN_NAME");
     private static final String TEST_MANAGER_PROJECT_CODE = System.getProperty("TEST_MANAGER_PROJECT_CODE");
+    private static final String TEST_MANAGER_REPOSITORY_URL = System.getProperty("TEST_MANAGER_REPOSITORY_URL");
+    private static final String TEST_MANAGER_REPOSITORY_BRANCH = System.getProperty("TEST_MANAGER_REPOSITORY_BRANCH");
 
     private static RestTemplate restTemplate;
 
@@ -98,16 +100,24 @@ final class TestManagerAPIClient {
     }
 
     public static RunDTO createRun() {
-        if (TEST_MANAGER_RUN_NAME == null) {
-            throw new IllegalArgumentException("TEST_MANAGER_RUN_NAME cannot be null");
+        if (TEST_MANAGER_RUN_NAME == null || TEST_MANAGER_RUN_NAME.isEmpty()) {
+            throw new IllegalArgumentException("TEST_MANAGER_RUN_NAME cannot be null or empty");
         }
 
-        if (TEST_MANAGER_PROJECT_CODE == null) {
-            throw new IllegalArgumentException("TEST_MANAGER_RUN_NAME cannot be null");
+        if (TEST_MANAGER_PROJECT_CODE == null || TEST_MANAGER_PROJECT_CODE.isEmpty()) {
+            throw new IllegalArgumentException("TEST_MANAGER_RUN_NAME cannot be null or empty");
+        }
+
+        if (TEST_MANAGER_REPOSITORY_URL == null || TEST_MANAGER_REPOSITORY_URL.isEmpty()) {
+            throw new IllegalArgumentException("TEST_MANAGER_REPOSITORY_URL cannot be null or empty");
+        }
+
+        if (TEST_MANAGER_REPOSITORY_BRANCH == null || TEST_MANAGER_REPOSITORY_BRANCH.isEmpty()) {
+            throw new IllegalArgumentException("TEST_MANAGER_REPOSITORY_BRANCH cannot be null or empty");
         }
 
         ltm.models.run.request.RunDTO run = new ltm.models.run.request.RunDTO(
-                TEST_MANAGER_RUN_NAME, TEST_MANAGER_PROJECT_CODE);
+                TEST_MANAGER_RUN_NAME, TEST_MANAGER_PROJECT_CODE, TEST_MANAGER_REPOSITORY_URL, TEST_MANAGER_REPOSITORY_BRANCH);
 
         String url = getAPIUrl() + "/runs";
         HttpEntity<ltm.models.run.request.RunDTO> request = new HttpEntity<>(run, getApiHeaders());
